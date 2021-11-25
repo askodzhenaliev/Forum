@@ -58,7 +58,7 @@ WSGI_APPLICATION = 'forum.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'forum_db_1',
+        'NAME': 'forum_db',
         'USER': 'postgres',
         'PASSWORD': 'abcd123456',
         'HOST': 'localhost',

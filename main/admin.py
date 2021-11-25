@@ -14,6 +14,7 @@ class ArticleAdmin(admin.ModelAdmin):
     inlines = [ArticleImageInline,]
 
 
+admin.site.register(Category)
 
 
 
