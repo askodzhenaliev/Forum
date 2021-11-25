@@ -21,11 +21,6 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        return super(Article, self).save(*args, **kwargs)
-
 
 class ArticleImage(models.Model):
     article_image = models.ImageField(upload_to='posts', blank=True, null=True)
