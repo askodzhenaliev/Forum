@@ -1,11 +1,11 @@
 from rest_framework import serializers
-
-from account.models import MyUser
+from .models import MyUser
+from .utils import send_activation_code
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.Charfield(min_length=6, write_only=True)
-    password_confirm = serializers.Charfield(min_length=6, write_only=True)
+    password = serializers.CharField(min_length=6, write_only=True)
+    password_confirm = serializers.CharField(min_length=6, write_only=True)
 
     class Meta:
         model = MyUser
@@ -22,4 +22,5 @@ class RegisterSerializer(serializers.ModelSerializer):
         email = validated_data.get('email')
         password = validated_data.get('password')
         user = MyUser.objects.create_user(email=email, password=password)
-        
+        send_activation_code(email=user.email, activation_code=user.activation_code)
+        return user

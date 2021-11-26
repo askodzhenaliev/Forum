@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth import get_user_model
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,5 +14,17 @@ class RegisterView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response("Successfully sign up!", status=status.HTTP_201_CREATED)
+
+
+class ActivateView(APIView):
+    def get(self, request, activation_code):
+        User = get_user_model()
+        user = get_object_or_404(User, activation_code=activation_code)
+        user.is_active = True
+        user.activation_code = ''
+        user.save()
+        return Response('You successfully activate your account!', status=status.HTTP_200_OK)
+
+
 
 
