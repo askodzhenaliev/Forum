@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.text import slugify
 from account.models import MyUser
 
 
@@ -17,11 +16,9 @@ class Article(models.Model):
     title = models.CharField(max_length=50, verbose_name="Заголовок")
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    article_image = models.FileField(blank=True, null=True, verbose_name="Добавить фото в статью")
 
     def __str__(self):
         return self.title
 
 
-class ArticleImage(models.Model):
-    article_image = models.ImageField(upload_to='posts', blank=True, null=True)
-    post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='images')
