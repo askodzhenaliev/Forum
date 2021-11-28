@@ -3,7 +3,7 @@ from account.models import MyUser
 
 
 class Category(models.Model):
-    slug = models.SlugField(max_length=64, primary_key=True)
+    slug = models.SlugField(max_length=255, primary_key=True)
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):

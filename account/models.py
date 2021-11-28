@@ -30,7 +30,7 @@ class MyUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=False)
-    activation_code = models.CharField(max_length=20, blank=True)
+    activation_code = models.CharField(max_length=35, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -46,4 +46,5 @@ class MyUser(AbstractUser):
         encode_string = string.encode()
         md5_object = hashlib.md5(encode_string)
         activation_code = md5_object.hexdigest()
+        print(activation_code, '2222222222222')
         self.activation_code = activation_code
