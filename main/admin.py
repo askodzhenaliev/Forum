@@ -13,6 +13,8 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'body')
 
 
+admin.site.register(Likes)
+
 admin.site.register(Comment, CommentAdmin)
 
 

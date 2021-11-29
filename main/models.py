@@ -1,8 +1,5 @@
 from django.db import models
 from account.models import MyUser
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Category(models.Model):
@@ -24,6 +21,10 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def total_likes(self):
+        return self.likes.count()
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
@@ -41,16 +42,6 @@ class Comment(models.Model):
         return 'Comment by {} on {}'.format(self.name, self.post)
 
 
-class Like(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='likes')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveSmallIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-
-class Post(models.Model):
-    likes = GenericRelation(Like)
-
-    @property
-    def total_likes(self):
-        return self.likes.count()
+class Likes(models.Model):
+    liked_articles = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='article_likes')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='author_likes')

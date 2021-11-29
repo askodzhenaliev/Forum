@@ -4,9 +4,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .permissions import IsPostAuthor
+from rest_framework.viewsets import ModelViewSet
 
-from .models import Category, Article
-from .serializers import CategorySerializer, ArticleSerializer
+
+from .models import Category, Article, Likes
+from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer
 
 
 class CategoryListView(generics.ListAPIView):
@@ -42,3 +44,16 @@ class ArticleViewSet(viewsets.ModelViewSet):
                                    Q(text__icontains=q))
         serializer = ArticleSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LikesView(ArticleViewSet, ModelViewSet):
+    queryset = Likes.objects.all()
+    serializer_class = LikeSerializer
+
+    @action(detail=False, methods=['get'])
+    def favorite(self, request, pk=None):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(author=request.user)
+        serializer = LikeSerializer(queryset, many=True,
+                                    context={'request': request})
+        return Response(serializer.data, status=200)

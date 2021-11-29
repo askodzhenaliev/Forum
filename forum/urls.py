@@ -4,13 +4,15 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
-from main.views import ArticleViewSet, CategoryListView
+from main.views import ArticleViewSet, CategoryListView, LikesView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 router = DefaultRouter()
 router.register('articles', ArticleViewSet)
+router.register('like', LikesView)
+
 
 schema_view = get_schema_view(
    openapi.Info(

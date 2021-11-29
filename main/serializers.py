@@ -28,3 +28,21 @@ class ArticleSerializer(serializers.ModelSerializer):
         return post
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = Likes
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        articles = validated_data.get('liked_articles')
+
+        if Likes.objects.filter(author=user, liked_articles=articles):
+            return Likes.objects.get(author=user, liked_articles=articles)
+        else:
+            return Likes.objects.create(author=user, liked_articles=articles)
+
+
