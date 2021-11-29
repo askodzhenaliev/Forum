@@ -46,5 +46,4 @@ class MyUser(AbstractUser):
         encode_string = string.encode()
         md5_object = hashlib.md5(encode_string)
         activation_code = md5_object.hexdigest()
-        print(activation_code, '2222222222222')
         self.activation_code = activation_code
