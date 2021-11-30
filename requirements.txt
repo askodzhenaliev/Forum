@@ -8,3 +8,5 @@ django-crispy-forms
 django-rest-swagger
 djangorestframework-simplejwt
 drf-yasg
+celery
+redis

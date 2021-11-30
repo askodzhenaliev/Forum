@@ -4,7 +4,9 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
-from main.views import ArticleViewSet, CategoryListView, LikesView
+
+from main import views
+from main.views import ArticleViewSet, CategoryListView, LikesView, AddStarRatingView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -12,6 +14,7 @@ from drf_yasg import openapi
 router = DefaultRouter()
 router.register('articles', ArticleViewSet)
 router.register('like', LikesView)
+router.register('rating', AddStarRatingView)
 
 
 schema_view = get_schema_view(
@@ -35,6 +38,7 @@ urlpatterns = [
     path('v1/api/categories/', CategoryListView.as_view()),
     path('v1/api/account/', include('account.urls')),
     path('v1/api/', include(router.urls)),
+    path('comment/<slug:slug>', views.addComment, name="comment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, reverse
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,8 +8,8 @@ from .permissions import IsPostAuthor
 from rest_framework.viewsets import ModelViewSet
 
 
-from .models import Category, Article, Likes
-from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer
+from .models import Category, Article, Likes, RatingStar, Rating, Comment
+from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CreateRatingSerializer
 
 
 class CategoryListView(generics.ListAPIView):
@@ -57,3 +58,29 @@ class LikesView(ArticleViewSet, ModelViewSet):
         serializer = LikeSerializer(queryset, many=True,
                                     context={'request': request})
         return Response(serializer.data, status=200)
+
+
+class AddStarRatingView(ArticleViewSet, ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = CreateRatingSerializer
+
+    def post(self, request):
+        serializer = CreateRatingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+
+
+def addComment(request, slug):
+    article = get_object_or_404(Article, slug=slug)
+
+    if request.method == "POST":
+        comment_author = request.POST.get("comment_author")
+        comment_content = request.POST.get("comment_content")
+
+        newComment = Comment(comment_author=comment_author, comment_content=comment_content)
+
+        newComment.article = article
+
+        newComment.save()
+    return redirect(reverse("article:detail", kwargs={"slug": slug}))

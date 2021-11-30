@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from account.models import MyUser
 
@@ -27,21 +28,48 @@ class Article(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
-    name = models.CharField(max_length=80)
-    email = models.EmailField()
-    body = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ('created',)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name="Статья", related_name="comments")
+    comment_author = models.CharField(max_length=50, verbose_name="Имя")
+    comment_content = models.CharField(max_length=200, verbose_name="Комментарий")
+    comment_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return 'Comment by {} on {}'.format(self.name, self.post)
+        return self.comment_content
+
+    class Meta:
+        ordering = ['-comment_date']
 
 
 class Likes(models.Model):
     liked_articles = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='article_likes')
     author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='author_likes')
+
+
+class RatingStar(models.Model):
+    value = models.IntegerField(
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+
+    def __str__(self):
+        return str(self.value)
+
+    class Meta:
+        verbose_name = 'Rating Star'
+        verbose_name_plural = 'Rating Stars'
+        ordering = ['-value']
+
+
+class Rating(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE,
+                                related_name='rating')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE,
+                               related_name='rating')
+    star = models.ForeignKey(RatingStar, on_delete=models.CASCADE,
+                             related_name='rating')
+
+    def __str__(self):
+        return f'{self.star} - {self.article}'
+
+    class Meta:
+        verbose_name = 'Rating'
+        verbose_name_plural = 'Ratings'
