@@ -38,7 +38,7 @@ urlpatterns = [
     path('v1/api/categories/', CategoryListView.as_view()),
     path('v1/api/account/', include('account.urls')),
     path('v1/api/', include(router.urls)),
-    path('comment/<slug:slug>', views.addComment, name="comment"),
+    path('v1/api/comment/<slug:slug>', views.addComment, name="comment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

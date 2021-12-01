@@ -10,3 +10,4 @@ djangorestframework-simplejwt
 drf-yasg
 celery
 redis
+
