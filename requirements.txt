@@ -1,13 +1,17 @@
-Django
+Django~=3.2.9
 psycopg2-binary
 Pillow
-djangorestframework
+djangorestframework~=3.12.4
+python-decouple
 django-ckeditor
 django-cleanup
 django-crispy-forms
 django-rest-swagger
 djangorestframework-simplejwt
 drf-yasg
-celery
+celery~=5.2.1
 redis
 
+
+serializers~=0.2.4
+decouple~=0.0.7
