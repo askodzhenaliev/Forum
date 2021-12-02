@@ -8,8 +8,9 @@ from .permissions import IsPostAuthor
 from rest_framework.viewsets import ModelViewSet
 
 
-from .models import Category, Article, Likes, Rating, Comment
-from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CommentSerializer, RatingSerializer
+from .models import Category, Article, Likes, Rating, Comment, Favorite
+from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CommentSerializer, RatingSerializer, \
+    FavoriteSerializer
 
 
 class IsAuthorPermission(BasePermission):
@@ -74,6 +75,23 @@ class LikesView(ArticleViewSet, ModelViewSet):
         serializer = LikeSerializer(queryset, many=True,
                                     context={'request': request})
         return Response(serializer.data, status=200)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def favorite(self, request, pk=None):
+        post = self.get_object()
+        obj, created = Favorite.objects.get_or_create(user=request.user, post=post)
+        if not created:
+            obj.favorite = not obj.favorite
+            obj.save()
+        favorite = 'Добавлено в любимые' if obj.favorite else 'Удалено из любимых'
+        return Response(f'Успешно {favorite}', status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def favorites(self, request):
+        queryset = Favorite.objects.all()
+        queryset = queryset.filter(user=request.user)
+        serializer = FavoriteSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CommentViewSet(PermissionMixin, viewsets.ModelViewSet):
