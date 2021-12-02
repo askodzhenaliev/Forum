@@ -28,16 +28,13 @@ class Article(models.Model):
 
 
 class Comment(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name="Статья", related_name="comments")
-    comment_author = models.CharField(max_length=50, verbose_name="Имя")
-    comment_content = models.CharField(max_length=200, verbose_name="Комментарий")
-    comment_date = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comment')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='comment')
 
     def __str__(self):
-        return self.comment_content
-
-    class Meta:
-        ordering = ['-comment_date']
+        return str(self.comment)
 
 
 class Likes(models.Model):

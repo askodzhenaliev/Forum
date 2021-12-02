@@ -32,6 +32,20 @@ class ArticleSerializer(serializers.ModelSerializer):
         return representation
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        author = request.user
+        comment = Comment.objects.create(author=author, **validated_data)
+        return comment
+
+
 class LikeSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.email')
 

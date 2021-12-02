@@ -2,14 +2,31 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, reverse
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from .permissions import IsPostAuthor
 from rest_framework.viewsets import ModelViewSet
 
 
 from .models import Category, Article, Likes, RatingStar, Rating, Comment
-from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CreateRatingSerializer
+from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CreateRatingSerializer, \
+    CommentSerializer
+
+
+class IsAuthorPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and request.user == obj.author
+
+
+class PermissionMixin:
+    def get_permissions(self):
+        if self.action == 'create':
+            permissions = [IsAuthenticated, ]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permissions = [IsAuthorPermission, ]
+        else:
+            permissions = []
+        return [permission() for permission in permissions]
 
 
 class CategoryListView(generics.ListAPIView):
@@ -71,16 +88,7 @@ class AddStarRatingView(ArticleViewSet, ModelViewSet):
             return Response(status=201)
 
 
-def addComment(request, slug):
-    article = get_object_or_404(Article, slug=slug)
+class CommentViewSet(PermissionMixin, viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
-    if request.method == "POST":
-        comment_author = request.POST.get("comment_author")
-        comment_content = request.POST.get("comment_content")
-
-        newComment = Comment(comment_author=comment_author, comment_content=comment_content)
-
-        newComment.article = article
-
-        newComment.save()
-    return redirect(reverse("article:detail", kwargs={"slug": slug}))

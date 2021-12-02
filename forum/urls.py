@@ -6,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
 from main import views
-from main.views import ArticleViewSet, CategoryListView, LikesView, AddStarRatingView
+from main.views import ArticleViewSet, CategoryListView, LikesView, AddStarRatingView, CommentViewSet
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -15,7 +15,7 @@ router = DefaultRouter()
 router.register('articles', ArticleViewSet)
 router.register('like', LikesView)
 router.register('rating', AddStarRatingView)
-
+router.register('comment', CommentViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -39,7 +39,6 @@ urlpatterns = [
     path('v1/api/account/', include('account.urls')),
     path('account/', include('account.urls')),
     path('v1/api/', include(router.urls)),
-    path('v1/api/comment/<slug:slug>', views.addComment, name="comment"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
