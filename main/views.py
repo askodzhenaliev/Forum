@@ -8,9 +8,8 @@ from .permissions import IsPostAuthor
 from rest_framework.viewsets import ModelViewSet
 
 
-from .models import Category, Article, Likes, RatingStar, Rating, Comment
-from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CreateRatingSerializer, \
-    CommentSerializer
+from .models import Category, Article, Likes, Rating, Comment
+from .serializers import CategorySerializer, ArticleSerializer, LikeSerializer, CommentSerializer, RatingSerializer
 
 
 class IsAuthorPermission(BasePermission):
@@ -77,18 +76,11 @@ class LikesView(ArticleViewSet, ModelViewSet):
         return Response(serializer.data, status=200)
 
 
-class AddStarRatingView(ArticleViewSet, ModelViewSet):
-    queryset = Rating.objects.all()
-    serializer_class = CreateRatingSerializer
-
-    def post(self, request):
-        serializer = CreateRatingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-
-
 class CommentViewSet(PermissionMixin, viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+
+class RatingViewSet(PermissionMixin, viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer

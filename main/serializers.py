@@ -16,7 +16,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = ('id', 'category', 'title', 'text', 'created_date', 'article_image')
 
-
     def create(self, validated_data):
         request = self.context.get('request')
         user_id = request.user.id
@@ -28,7 +27,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['author'] = instance.author.email
         representation['likes'] = Likes.objects.filter(liked_articles=instance).count()
-        representation['rating'] = Rating.objects.filter(article=instance).count()
+        representation['rating'] = instance.rating.aggregate(Avg('rating'))
         return representation
 
 
@@ -64,19 +63,32 @@ class LikeSerializer(serializers.ModelSerializer):
             return Likes.objects.create(author=user, liked_articles=articles)
 
 
-class CreateRatingSerializer(serializers.ModelSerializer):
+class RatingSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
     class Meta:
         model = Rating
-        fields = ('star', 'article')
+        fields = '__all__'
 
     def create(self, validated_data):
         request = self.context.get('request')
-        rating, user = Rating.objects.update_or_create(
-            article=validated_data.get('article', None),
-            author=request.user,
-            star=validated_data.get("star", None)
-        )
+        author = request.user
+        post = validated_data.get('post')
+        rating = Rating.objects.get_or_create(author=author, post=post)[0]
+        rating.rating = validated_data['rating']
+        rating.save()
         return rating
 
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = instance.user.email
+        representation['post'] = instance.post.title
+        return representation
 
 

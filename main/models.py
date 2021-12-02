@@ -42,31 +42,19 @@ class Likes(models.Model):
     author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='author_likes')
 
 
-class RatingStar(models.Model):
-    value = models.IntegerField(
-        default=1, validators=[MinValueValidator(1), MaxValueValidator(5)]
-    )
-
-    def __str__(self):
-        return str(self.value)
-
-    class Meta:
-        verbose_name = 'Rating Star'
-        verbose_name_plural = 'Rating Stars'
-        ordering = ['-value']
-
-
 class Rating(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE,
-                                related_name='rating')
-    author = models.ForeignKey(MyUser, on_delete=models.CASCADE,
-                               related_name='rating')
-    star = models.ForeignKey(RatingStar, on_delete=models.CASCADE,
-                             related_name='rating')
+    rating = models.IntegerField(default=0)
+    post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='rating')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='rating')
 
     def __str__(self):
-        return f'{self.star} - {self.article}'
+        return str(self.rating)
 
-    class Meta:
-        verbose_name = 'Rating'
-        verbose_name_plural = 'Ratings'
+
+class Favorite(models.Model):
+    post = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='favorite')
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favorite')
+    favorite = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.favorite)
